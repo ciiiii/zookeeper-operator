@@ -10,6 +10,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/ciiiii/zookeeper-operator/pkg/client/zookeeper"
+	"github.com/ciiiii/zookeeper-operator/pkg/util"
 )
 
 func readyAction(myId int, host string) {
@@ -70,7 +71,7 @@ func readyAction(myId int, host string) {
 		}
 		fmt.Println("servers: ", strings.Join(servers, ", "))
 
-		if err := forceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
+		if err := util.ForceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
 			klog.Fatalf("failed to write dynamic config file: %v", err)
 		}
 	case "participant":

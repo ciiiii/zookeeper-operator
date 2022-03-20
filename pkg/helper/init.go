@@ -10,6 +10,7 @@ import (
 	"k8s.io/klog"
 
 	"github.com/ciiiii/zookeeper-operator/pkg/client/zookeeper"
+	"github.com/ciiiii/zookeeper-operator/pkg/util"
 )
 
 func initAction(myId int, host string) {
@@ -59,7 +60,7 @@ func syncMyIdFile(myId int) error {
 	}
 	if !myIdSynced {
 		klog.Infof("writing myid(%d) to %q", myId, myIdFile)
-		if err := forceWriteFile(myIdFile, []byte(strconv.Itoa(myId))); err != nil {
+		if err := util.ForceWriteFile(myIdFile, []byte(strconv.Itoa(myId))); err != nil {
 			return err
 		}
 	}
@@ -109,7 +110,7 @@ func initCluster(host string, myId int) error {
 	if !dynamicConfigured {
 		klog.Infof("writing configuration to %q", dynamicConfig)
 		serverStr := fmt.Sprintf("server.%d=%s", myId, generateServerStr(host, ROLE_PARTICIPANT))
-		if err := forceWriteFile(dynamicConfig, []byte(serverStr)); err != nil {
+		if err := util.ForceWriteFile(dynamicConfig, []byte(serverStr)); err != nil {
 			return err
 		}
 	}
@@ -144,7 +145,7 @@ func joinCluster(myId int, host, role string) error {
 	if err != nil {
 		return err
 	}
-	if err := forceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
+	if err := util.ForceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
 		return err
 	}
 	return nil
@@ -159,7 +160,7 @@ func syncStaticConfig() error {
 	switch {
 	case statErr != nil && os.IsNotExist(statErr):
 		klog.Infof("static config not exists, writing to %q directly", staticConfig)
-		if err := forceWriteFile(staticConfig, rawConfigBytes); err != nil {
+		if err := util.ForceWriteFile(staticConfig, rawConfigBytes); err != nil {
 			return err
 		}
 		return nil
@@ -179,11 +180,11 @@ func syncStaticConfig() error {
 	existDynmaicConfig := parseSpecificLine(configBytes, configPrefix)
 	if existDynmaicConfig != "" {
 		configLines := append(dropSpecificLine(rawConfigBytes, configPrefix), existDynmaicConfig)
-		if err := forceWriteFile(staticConfig, []byte(strings.Join(configLines, "\n"))); err != nil {
+		if err := util.ForceWriteFile(staticConfig, []byte(strings.Join(configLines, "\n"))); err != nil {
 			return err
 		}
 	} else {
-		if err := forceWriteFile(staticConfig, rawConfigBytes); err != nil {
+		if err := util.ForceWriteFile(staticConfig, rawConfigBytes); err != nil {
 			return err
 		}
 	}
@@ -254,14 +255,14 @@ func oldInitAction(myId int, host string) {
 	// write config when myId and dynamic config both are not configured
 	if !myIdConfigured || !dynamicConfigured {
 		klog.Infof("writing myid(%d) to %q", myId, myIdFile)
-		if err := forceWriteFile(myIdFile, []byte(strconv.Itoa(myId))); err != nil {
+		if err := util.ForceWriteFile(myIdFile, []byte(strconv.Itoa(myId))); err != nil {
 			klog.Fatalf("failed to write myid file: %v", err)
 		}
 		// first node write dynamic config directly
 		if myId == 1 {
 			klog.Infof("writing configuration to %q", dynamicConfig)
 			serverStr := fmt.Sprintf("server.%d=%s", myId, generateServerStr(host, ROLE_PARTICIPANT))
-			if err := forceWriteFile(dynamicConfig, []byte(serverStr)); err != nil {
+			if err := util.ForceWriteFile(dynamicConfig, []byte(serverStr)); err != nil {
 				klog.Fatalf("failed to write dynamic config file: %v", err)
 			}
 		}
@@ -330,7 +331,7 @@ func oldInitAction(myId int, host string) {
 			klog.Fatalf("failed to create dynamic config file: %v", err)
 		}
 		defer f.Close()
-		if err := forceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
+		if err := util.ForceWriteFile(dynamicConfig, []byte(strings.Join(servers, "\n"))); err != nil {
 			klog.Fatalf("failed to write dynamic config file: %v", err)
 		}
 	}

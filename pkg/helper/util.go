@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -58,28 +57,6 @@ func parseServerRole(s string) string {
 	}
 }
 
-func createOrOpen(path string) (*os.File, error) {
-	_, err := os.Stat(path)
-	switch {
-	case err != nil && os.IsNotExist(err):
-		dir := filepath.Dir(path)
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				return nil, err
-			}
-		}
-		f, err := os.Create(path)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	case err != nil:
-		return nil, err
-	default:
-		return os.Open(path)
-	}
-}
-
 func generateServerStr(host, role string) string {
 	return fmt.Sprintf("%s.%s:%s:%s:%s;%s", host, domain, followerPort, leaderElectionPort, role, clientPort)
 }
@@ -96,44 +73,6 @@ func checkEnsembleAvailable(domain string) (bool, error) {
 		return false, err
 	}
 	return true, nil
-}
-
-func forceWriteFile(path string, content []byte) error {
-	_, err := os.Stat(path)
-	switch {
-	case err != nil && os.IsNotExist(err):
-		parent := filepath.Dir(path)
-		if _, err := os.Stat(parent); os.IsNotExist(err) {
-			if err := os.MkdirAll(parent, 0755); err != nil {
-				return err
-			}
-		} else if err != nil {
-			return err
-		}
-		f, err := os.Create(path)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = f.Write(content)
-		if err != nil {
-			return err
-		}
-		return nil
-	case err != nil:
-		return err
-	default:
-		f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-		_, err = f.Write(content)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
 }
 
 func ContainsString(slice []string, str string) bool {
