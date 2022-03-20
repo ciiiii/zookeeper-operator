@@ -58,9 +58,3 @@ func removeAction(myId int, host string) {
 	}
 	klog.Infof("no label %s, skip removing node %d", constants.RemovalPodLabel, myId)
 }
-
-type patchSliceValue struct {
-	Op    string   `json:"op"`
-	Path  string   `json:"path"`
-	Value []string `json:"value"`
-}

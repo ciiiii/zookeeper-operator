@@ -19,6 +19,7 @@ import (
 
 	"github.com/ciiiii/zookeeper-operator/pkg/client/zookeeper"
 	"github.com/ciiiii/zookeeper-operator/pkg/constants"
+	"github.com/ciiiii/zookeeper-operator/pkg/util"
 )
 
 func watchAction(myId int, host string) {
@@ -50,7 +51,7 @@ func updateServerStatusTicker(myId int, host string, clientset kubernetes.Interf
 		case c := <-ticker.C:
 			klog.Infof("update server status at %s", c.String())
 			ok, message, mode := getServerStatus()
-			patch := []patchMapValue{
+			patch := []util.PatchMapValue{
 				{
 					Op:   "replace",
 					Path: "/metadata/annotations",
@@ -88,12 +89,6 @@ func getServerStatus() (ok bool, message string, mode string) {
 		mode = stat.Mode.String()
 	}
 	return
-}
-
-type patchMapValue struct {
-	Op    string            `json:"op"`
-	Path  string            `json:"path"`
-	Value map[string]string `json:"value"`
 }
 
 func waitConnectionsClose(timeout, period time.Duration) {
