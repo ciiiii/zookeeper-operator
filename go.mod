@@ -79,4 +79,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/go-zookeeper/zk => ../zk
+replace github.com/go-zookeeper/zk => github.com/ciiiii/zk v1.0.3-0.20220320151538-190aa5299439
