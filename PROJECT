@@ -1,0 +1,37 @@
+domain: example.com
+layout:
+- go.kubebuilder.io/v3
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: zookeeper-operator
+repo: github.com/ciiiii/zookeeper-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: example.com
+  group: zookeeper
+  kind: ZooKeeperCluster
+  path: github.com/ciiiii/zookeeper-operator/pkg/apis/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: example.com
+  group: zookeeper
+  kind: ZooKeeperBackup
+  path: github.com/ciiiii/zookeeper-operator/pkg/apis/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: example.com
+  group: zookeeper
+  kind: ZooKeeperRestore
+  path: github.com/ciiiii/zookeeper-operator/api/v1alpha1
+  version: v1alpha1
+version: "3"
