@@ -1,0 +1,218 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+  creationTimestamp: null
+  name: zookeeperbackups.zookeeper.example.com
+spec:
+  group: zookeeper.example.com
+  names:
+    kind: ZooKeeperBackup
+    listKind: ZooKeeperBackupList
+    plural: zookeeperbackups
+    shortNames:
+    - zkbackup
+    singular: zookeeperbackup
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.mode
+      name: Mode
+      type: string
+    - jsonPath: .spec.schedule
+      name: Schedule
+      priority: 1
+      type: string
+    - jsonPath: .spec.suspend
+      name: Suspend
+      priority: 1
+      type: boolean
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    - jsonPath: .status.message
+      name: Message
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ZooKeeperBackup is the Schema for the zookeeperbackups API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ZooKeeperBackupSpec defines the desired state of ZooKeeperBackup
+            properties:
+              image:
+                type: string
+              mode:
+                default: once
+                type: string
+              schedule:
+                type: string
+              source:
+                properties:
+                  dataDir:
+                    default: /data/version-2
+                    type: string
+                  host:
+                    type: string
+                  labelSelector:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  name:
+                    type: string
+                  port:
+                    default: 8080
+                    format: int32
+                    type: integer
+                type: object
+              suspend:
+                default: false
+                type: boolean
+              target:
+                properties:
+                  oss:
+                    properties:
+                      accessKeySecret:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      bucket:
+                        type: string
+                      createBucketIfNotPresent:
+                        type: boolean
+                      endpoint:
+                        type: string
+                      key:
+                        type: string
+                      secretKeySecret:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
+                  s3:
+                    properties:
+                      accessKeySecret:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                      bucket:
+                        type: string
+                      endpoint:
+                        type: string
+                      key:
+                        type: string
+                      region:
+                        type: string
+                      secretKeySecret:
+                        description: SecretKeySelector selects a key of a Secret.
+                        properties:
+                          key:
+                            description: The key of the secret to select from.  Must
+                              be a valid secret key.
+                            type: string
+                          name:
+                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            type: string
+                          optional:
+                            description: Specify whether the Secret or its key must
+                              be defined
+                            type: boolean
+                        required:
+                        - key
+                        type: object
+                    type: object
+                type: object
+            type: object
+          status:
+            description: ZooKeeperBackupStatus defines the observed state of ZooKeeperBackup
+            properties:
+              message:
+                type: string
+              record:
+                items:
+                  properties:
+                    finishTime:
+                      format: date-time
+                      type: string
+                    key:
+                      type: string
+                    startTime:
+                      format: date-time
+                      type: string
+                  type: object
+                type: array
+              status:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
