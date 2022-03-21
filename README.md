@@ -1,4 +1,5 @@
 # zookeeper-operator
+[![Actions Status](https://github.com/ciiiii/zookeeper-operator/workflows/Publish%20Docker%20image/badge.svg)](https://github.com/ciiiii/zookeeper-operator/actions)
 
 ## CRD
 ### ZooKeeperCluster
