@@ -205,9 +205,6 @@ func (r *ZooKeeperRestoreReconciler) parseRequiredInfo(ctx context.Context, rest
 		return nil, nil, fmt.Sprintf("no PVC bind with target StatefulSet %s:%s", sts.Namespace, sts.Name), nil
 	}
 	pvcNamePrefix := sts.Spec.VolumeClaimTemplates[0].Name
-	if restore.Spec.Target.Host == "" || restore.Spec.Target.Port == 0 {
-		return nil, nil, "no host or port specified for restore target", nil
-	}
 	var pvcList []string
 	for index := 0; index < int(*sts.Spec.Replicas); index++ {
 		pvcName := fmt.Sprintf("%s-%s-%d", pvcNamePrefix, sts.Name, index)
