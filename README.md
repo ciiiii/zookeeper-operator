@@ -179,4 +179,4 @@ helm install zookeeper-operator <alias>/zookeeper-operator
 ```
 ## PS
 - Test passed on Kubernetes 1.17.12, only support `batchv1beta1.CronJob`, schedule backup will not work in newer version without `batchv1beta1.CronJob`, other features should not be affected.
-- There are still some problem about restore which mey be related to currentEpoch and acceptedEpoch.
+- There are still some problems about restore which may be related to currentEpoch and acceptedEpoch.
