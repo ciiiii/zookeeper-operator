@@ -115,6 +115,12 @@ func (r *ZooKeeperRestoreReconciler) reconcileStatus(ctx context.Context, restor
 	if err := r.Get(ctx, client.ObjectKey{Name: fmt.Sprintf(constants.RestorePrefix, restore.Name), Namespace: restore.Namespace}, targetJob); err != nil {
 		return err
 	}
+	if restore.Status.Status == zkv1alpha1.RestoreStatusCompleted && !restore.Spec.RolloutRestart {
+		return nil
+	}
+	if restore.Status.Status == zkv1alpha1.RestoreStatusRestarted && restore.Spec.RolloutRestart {
+		return nil
+	}
 	var status zkv1alpha1.ClusterRestoreStatus
 	switch {
 	case targetJob.Status.Succeeded == *targetJob.Spec.Completions:
