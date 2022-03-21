@@ -1,6 +1,7 @@
 # zookeeper-operator
 
-## ZooKeeperCluster
+## CRD
+### ZooKeeperCluster
 ```yaml
 apiVersion: zookeeper.example.com/v1alpha1
 kind: ZooKeeperCluster
@@ -23,14 +24,14 @@ spec:
     staticConfig: zoo.cfg
     dynamicConfig: zoo.cfg.dynamic
 ```
-### Specification
+#### Specification
 - replicas: number of zookeeper servers, can be dynamicly modified
 - cluterDomain: must be set correctly with 
 - clearPersistence: clear PVC when cluster destory or not
 - image: zookeeper image
 - helperImage: zookeeper helper image, used to init server, report, clear data
 - config: zookeeper config options, all have default values
-### Status
+#### Status
 ```yaml
 status:
   readyReplicas: 3
@@ -61,7 +62,7 @@ status:
 - service: zookeeper service host
 - conditions: to be implemented
 
-## ZooKeeperBackup
+### ZooKeeperBackup
 ```yaml
 apiVersion: zookeeper.example.com/v1alpha1
 kind: ZooKeeperBackup
@@ -87,7 +88,7 @@ spec:
         name: oss-key
         key: secretKey
 ```
-### Specification
+#### Specification
 - image: zookeeper backup job image
 - mode: backup mode, can be once, shedule
 - schedule: backup schedule, only valid when mode is shedule, format is cron
@@ -99,7 +100,7 @@ spec:
 - target: backup target, must be set, can use oss or s3
     - oss is alicloud oss, must set endpoint, bucket, accessKeySecret and secretKeySecret
     - s3 is not supported yet
-### Status
+#### Status
 ```yaml
 status:
   record:
@@ -117,7 +118,7 @@ status:
 
 PS: finishTime update not work for now, will be fixed in future(metav1.Time in patch)
 
-## ZooKeeperRestore
+### ZooKeeperRestore
 ```yaml
 apiVersion: zookeeper.example.com/v1alpha1
 kind: ZooKeeperRestore
@@ -142,7 +143,7 @@ spec:
     name: test
     dataDir: /version-2
 ```
-### Specification
+#### Specification
 - image: zookeeper restore job image
 - rolloutRestart: used to rollout restart statefulset after restore
 - source: backup source, must be set
@@ -153,7 +154,7 @@ spec:
 - target: restore target, must be set
     - can use name or label selector to specify target statefulset
     - dataDir is used to specify zookeeper data directory
-### Status
+#### Status
 ```yaml
 status:
   status: restarted
@@ -161,3 +162,20 @@ status:
 - status: restore status, can be completed, failed, running, pending, restarted
     - restarted: only appear when rolloutRestart is true
 - message: restore error message
+
+## Deploy
+1. helm charts in git repo
+```bash
+cd charts/zookeeper-operator
+
+helm install zookeeper-operator ./
+```
+2. helm charts in charts repo
+```bash
+helm add repo <alias> https://github.com/ciiiii/helm-charts.git
+
+helm install zookeeper-operator <alias>/zookeeper-operator
+```
+## PS
+- Test passed on Kubernetes 1.17.12, only support `batchv1beta1.CronJob`, schedule backup will not work in newer version without `batchv1beta1.CronJob`, other features should not be affected.
+- There are still some problem about restore which mey be related to currentEpoch and acceptedEpoch.
