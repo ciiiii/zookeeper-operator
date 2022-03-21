@@ -203,6 +203,7 @@ controllers:
     - parse server status from Pod annotations
   - reconcileFinalizer
     - handling PVC clear
+
 **BackupController**:
 - watch:
   - ZooKeeperBackup
@@ -217,6 +218,7 @@ controllers:
     - update error message which shouldn't be requeued
   - reconcileStatus
     - calculate backup status from pods and jobs status
+
 #### RestoreController:
 - watch:
   - ZookKeeperRestore
