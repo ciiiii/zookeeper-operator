@@ -177,6 +177,79 @@ helm add repo <alias> https://github.com/ciiiii/helm-charts.git
 
 helm install zookeeper-operator <alias>/zookeeper-operator
 ```
+## Implementation
+### zk-manager
+
+entry: cmd/manager/main.go
+
+controllers:
+
+**ClusterController**:
+- watch: 
+  - ZooKeeperCluster
+  - StatefulSet
+  - Service
+  - ConfigMap
+  - Pod(filter with labels)
+- reconcile:
+  - reoncileGeneric: reconcile resource without special logic
+    - Service
+    - ConfigMap
+    - Role, RoleBinding, ServiceAccount
+  - reconcileStatefulset:
+    - handling scaling up/down
+    - handling image update
+  - reconcileStatus
+    - parse server status from Pod annotations
+  - reconcileFinalizer
+    - handling PVC clear
+**BackupController**:
+- watch:
+  - ZooKeeperBackup
+  - Job
+  - CronJob
+- reconcile:
+  - reconcileJob/reconcileCronJob
+    - choose leader's pvc to backup
+    - job is almost immutable
+    - cronJob should be updated when spec changes
+  - reconcileMessage
+    - update error message which shouldn't be requeued
+  - reconcileStatus
+    - calculate backup status from pods and jobs status
+#### RestoreController:
+- watch:
+  - ZookKeeperRestore
+  - Job
+- reconcile:
+  - reconcileJob
+    - restore data to all pod's pvc
+    - job is almost immutable
+  - reconcileMessage
+    - update error message which shouldn't be requeued
+  - reconcileStatus
+    - calculate restore status from pods and jobs status
+    - rollout restart statefulset if necessary
+### zk-helper
+entry: cmd/helper/main.go
+actions:
+- init(run in initContainer):
+  1. sync myId file
+  2. sync dynamic config file: init cluster or join cluster
+  3. sync static config
+- ready(run by readinessProbe):
+  1. check server is ready from remote and local
+  2. switch from observer to participant
+- watch(run in sidecar):
+  1. get server status and patch to Pod annotations
+  2. wait for connections close before exit
+  3. clear zookeeper server config when server is scaling down
+- stop(run by preStopHook):
+  1. prevent zookeeper exit directly
+- backup(run in backup job):
+  1. save zookeeper data to oss
+- resotre(run in restore job):
+  1. load oss data to zookeeper data directory
 ## PS
 - Test passed on Kubernetes 1.17.12, only support `batchv1beta1.CronJob`, schedule backup will not work in newer version without `batchv1beta1.CronJob`, other features should not be affected.
 - There are still some problems about restore which may be related to currentEpoch and acceptedEpoch.
