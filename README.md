@@ -31,6 +31,7 @@ spec:
 - clearPersistence: clear PVC when cluster destory or not
 - image: zookeeper image
 - helperImage: zookeeper helper image, used to init server, report, clear data
+  - the older images have some problems, if you have pulled, please use `helperImage: go2sheep/zk-helper:10cc9d8` to pull new one.
 - config: zookeeper config options, all have default values
 #### Status
 ```yaml
@@ -91,6 +92,7 @@ spec:
 ```
 #### Specification
 - image: zookeeper backup job image
+  - the older images have some problems, if you have pulled, please use `image: go2sheep/zk-helper:10cc9d8` to pull new one.
 - mode: backup mode, can be once, shedule
 - schedule: backup schedule, only valid when mode is shedule, format is cron
 - suspend: used to suspend job in shedule mode
@@ -146,6 +148,7 @@ spec:
 ```
 #### Specification
 - image: zookeeper restore job image
+  - the older images have some problems, if you have pulled, please use `image: go2sheep/zk-helper:10cc9d8` to pull new one.
 - rolloutRestart: used to rollout restart statefulset after restore
 - source: backup source, must be set
     - oss is alicloud oss, must set endpoint, bucket, key, accessKeySecret and secretKeySecret.
@@ -234,6 +237,7 @@ controllers:
     - rollout restart statefulset if necessary
 ### zk-helper
 entry: cmd/helper/main.go
+
 actions:
 - init(run in initContainer):
   1. sync myId file
